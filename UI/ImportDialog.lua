@@ -161,6 +161,23 @@ end
 -- Preview in Dressing Room
 -------------------------------------------------------------------------------
 
+--- Resolve a transmog source ID for DressUpVisual: prefer explicit `s`, else derive from item `i`.
+local function GetDressUpSourceID(slotData)
+    if slotData.s and slotData.s > 0 then
+        return slotData.s
+    end
+    if slotData.i and slotData.i > 0 then
+        local itemLink = select(2, GetItemInfo(slotData.i))
+        if itemLink then
+            local ok, _, sourceID = pcall(C_TransmogCollection.GetItemInfo, itemLink)
+            if ok and sourceID and sourceID > 0 then
+                return sourceID
+            end
+        end
+    end
+    return nil
+end
+
 local function PreviewInDressingRoom(outfit)
     DressUpFrame_Show(DressUpFrame)
 
@@ -176,8 +193,9 @@ local function PreviewInDressingRoom(outfit)
     for _, slotKey in ipairs(StyleBound.SLOTS) do
         local slotData = outfit.slots[slotKey]
         if slotData then
-            if slotData.s and slotData.s > 0 then
-                DressUpVisual(slotData.s)
+            local sourceID = GetDressUpSourceID(slotData)
+            if sourceID then
+                DressUpVisual(sourceID)
             end
         end
     end
