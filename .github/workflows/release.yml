@@ -15,6 +15,10 @@ jobs:
 
       - name: Package and upload
         uses: BigWigsMods/packager@v2
+        with:
+          # Default CurseForge *file list name* is only {project-version}; untagged builds use the
+          # short git hash (e.g. 91d693c). Prefix with {package-name} so uploads stay readable.
+          args: '-n ":{package-name}-{project-version}{beta}{nolib}{classic}"'
         env:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
           RELEASE_TYPE: beta
